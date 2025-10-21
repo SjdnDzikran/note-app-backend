@@ -44,6 +44,10 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## API reference
+
+After starting the server, open [http://localhost:3000/docs](http://localhost:3000/docs) to explore the Swagger UI generated from the OpenAPI document.
+
 ## Run tests
 
 ```bash
