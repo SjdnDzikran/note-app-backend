@@ -21,11 +21,27 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
       };
     }
 
+    const defaultSsl =
+      configService.get<string>('DB_SSL', process.env.NODE_ENV === 'production' ? 'true' : 'false') ===
+      'true';
+    const rejectUnauthorized =
+      configService.get<string>('DB_SSL_REJECT_UNAUTHORIZED', 'false') === 'true';
+
     const databaseUrl = configService.get<string>('DATABASE_URL');
     if (databaseUrl) {
+      const parsed = new URL(databaseUrl);
+      const isRailwayInternal = parsed.hostname.endsWith('.railway.internal');
+
+      const ssl = isRailwayInternal
+        ? false
+        : defaultSsl
+        ? { rejectUnauthorized }
+        : false;
+
       return {
         type: 'postgres',
         url: databaseUrl,
+        ssl,
         autoLoadEntities: true,
         ...baseOptions,
       };
@@ -38,6 +54,7 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
       username: configService.get<string>('DB_USERNAME', 'postgres'),
       password: configService.get<string>('DB_PASSWORD', 'postgres'),
       database: configService.get<string>('DB_NAME', 'note_app'),
+      ssl: defaultSsl ? { rejectUnauthorized } : false,
       autoLoadEntities: true,
       ...baseOptions,
     };

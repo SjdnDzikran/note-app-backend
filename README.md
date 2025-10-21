@@ -55,6 +55,13 @@ The application uses PostgreSQL via TypeORM in development/production. Set one o
 - `DATABASE_URL=postgres://user:password@host:5432/database`
 - or individual vars: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`
 
+### Railway quick start
+
+1. In your Railway project, click **New → Database → PostgreSQL** and wait for the instance to provision.
+2. Open the database service, copy the `Postgres Connection URL`, and add it to your Nest service’s variables as `DATABASE_URL`.
+3. When Railway gives you an internal host such as `postgres.railway.internal`, SSL is automatically disabled by the app (no extra env required). For public endpoints keep TLS on by leaving `DB_SSL` at its default (`true`). Set `DB_SSL_REJECT_UNAUTHORIZED=true` only if you need strict certificate validation.
+4. Redeploy the app. TypeORM will now connect using the provided URL.
+
 When `NODE_ENV=test`, the app automatically falls back to an in-memory SQLite database so the Jest test suites can run without a Postgres instance.
 
 ## Run tests
