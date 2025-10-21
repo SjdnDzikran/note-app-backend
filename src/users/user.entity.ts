@@ -9,9 +9,9 @@ export class User {
   @Column({ length: 120 })
   username!: string;
 
-  @Column()
+  @Column({ type: 'text' })
   passwordHash!: string;
 
-  @Column({ nullable: true })
-  refreshTokenHash?: string | null;
+  @Column({ type: 'text', nullable: true })
+  refreshTokenHash!: string | null;
 }
