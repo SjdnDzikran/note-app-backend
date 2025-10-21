@@ -1,16 +1,16 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
+import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Note } from '../notes/note.entity';
 import { User } from '../users/user.entity';
 
 export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
-  useFactory: (configService: ConfigService) => {
+  useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
     const isTestEnv = configService.get<string>('NODE_ENV') === 'test';
-    const baseOptions = {
+    const baseOptions: Pick<TypeOrmModuleOptions, 'entities' | 'synchronize'> = {
       entities: [User, Note],
       synchronize: true,
-    } as const;
+    };
 
     if (isTestEnv) {
       return {
