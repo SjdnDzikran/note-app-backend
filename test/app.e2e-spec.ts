@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 
+process.env.NODE_ENV = process.env.NODE_ENV ?? 'test';
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let createdNoteId: string | undefined;

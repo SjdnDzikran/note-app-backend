@@ -1,17 +1,28 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
 import { JWT_SECRET } from './constants';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: UsersService;
+  let moduleRef: TestingModule;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    moduleRef = await Test.createTestingModule({
       imports: [
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          dropSchema: true,
+          entities: [User],
+          synchronize: true,
+        }),
+        TypeOrmModule.forFeature([User]),
         JwtModule.register({
           secret: JWT_SECRET,
         }),
@@ -19,8 +30,12 @@ describe('AuthService', () => {
       providers: [AuthService, UsersService],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
-    usersService = module.get<UsersService>(UsersService);
+    service = moduleRef.get<AuthService>(AuthService);
+    usersService = moduleRef.get<UsersService>(UsersService);
+  });
+
+  afterEach(async () => {
+    await moduleRef.close();
   });
 
   it('registers new users and returns tokens', async () => {

@@ -1,16 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { Note } from './note.entity';
 import { NotesService } from './notes.service';
 
 describe('NotesService', () => {
   let service: NotesService;
+  let moduleRef: TestingModule;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    moduleRef = await Test.createTestingModule({
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          dropSchema: true,
+          entities: [Note],
+          synchronize: true,
+        }),
+        TypeOrmModule.forFeature([Note]),
+      ],
       providers: [NotesService],
     }).compile();
 
-    service = module.get<NotesService>(NotesService);
+    service = moduleRef.get<NotesService>(NotesService);
+  });
+
+  afterEach(async () => {
+    await moduleRef.close();
   });
 
   it('creates and retrieves a note', async () => {

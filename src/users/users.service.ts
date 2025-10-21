@@ -1,46 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import type { User } from './user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  private readonly users = new Map<string, User>();
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
 
   async createUser(username: string, passwordHash: string): Promise<User> {
-    const id = randomUUID();
-    const user: User = {
-      id,
+    const user = this.usersRepository.create({
       username,
       passwordHash,
       refreshTokenHash: null,
-    };
+    });
 
-    this.users.set(id, user);
-    return { ...user };
+    return this.usersRepository.save(user);
   }
 
-  async findByUsername(username: string): Promise<User | undefined> {
-    for (const user of this.users.values()) {
-      if (user.username === username) {
-        return { ...user };
-      }
-    }
-
-    return undefined;
+  findByUsername(username: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { username },
+    });
   }
 
-  async findById(id: string): Promise<User | undefined> {
-    const user = this.users.get(id);
-    return user ? { ...user } : undefined;
+  findById(id: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { id },
+    });
   }
 
   async setRefreshToken(userId: string, refreshTokenHash: string | null): Promise<void> {
-    const user = this.users.get(userId);
+    const updateResult = await this.usersRepository.update(userId, { refreshTokenHash });
 
-    if (!user) {
+    if (updateResult.affected === 0) {
       throw new NotFoundException('User not found');
     }
-
-    user.refreshTokenHash = refreshTokenHash;
   }
 }

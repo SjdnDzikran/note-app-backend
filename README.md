@@ -48,6 +48,15 @@ $ npm run start:prod
 
 After starting the server, open [http://localhost:3000/docs](http://localhost:3000/docs) to explore the Swagger UI generated from the OpenAPI document.
 
+## Database configuration
+
+The application uses PostgreSQL via TypeORM in development/production. Set one of the following before running the server:
+
+- `DATABASE_URL=postgres://user:password@host:5432/database`
+- or individual vars: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`
+
+When `NODE_ENV=test`, the app automatically falls back to an in-memory SQLite database so the Jest test suites can run without a Postgres instance.
+
 ## Run tests
 
 ```bash

@@ -1,16 +1,27 @@
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JWT_SECRET } from './constants';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 
 describe('AuthController', () => {
   let controller: AuthController;
+  let moduleRef: TestingModule;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    moduleRef = await Test.createTestingModule({
       imports: [
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          dropSchema: true,
+          entities: [User],
+          synchronize: true,
+        }),
+        TypeOrmModule.forFeature([User]),
         JwtModule.register({
           secret: JWT_SECRET,
         }),
@@ -19,7 +30,11 @@ describe('AuthController', () => {
       providers: [AuthService, UsersService],
     }).compile();
 
-    controller = module.get<AuthController>(AuthController);
+    controller = moduleRef.get<AuthController>(AuthController);
+  });
+
+  afterEach(async () => {
+    await moduleRef.close();
   });
 
   it('registers users and returns token pairs', async () => {

@@ -1,56 +1,49 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import type { Note } from './note.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import type { CreateNoteDto } from './dto/create-note.dto';
 import type { UpdateNoteDto } from './dto/update-note.dto';
+import { Note } from './note.entity';
 
 @Injectable()
 export class NotesService {
-  private readonly notes = new Map<string, Note>();
+  constructor(
+    @InjectRepository(Note)
+    private readonly notesRepository: Repository<Note>,
+  ) {}
 
-  async create(payload: CreateNoteDto): Promise<Note> {
-    const now = new Date();
-    const note: Note = {
-      id: randomUUID(),
-      title: payload.title,
-      content: payload.content,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    this.notes.set(note.id, note);
-    return { ...note };
+  create(payload: CreateNoteDto): Promise<Note> {
+    const note = this.notesRepository.create(payload);
+    return this.notesRepository.save(note);
   }
 
   async findAll(): Promise<Note[]> {
-    return Array.from(this.notes.values()).map((note) => ({ ...note }));
+    return this.notesRepository.find({
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: string): Promise<Note> {
-    const note = this.notes.get(id);
+    const note = await this.notesRepository.findOne({
+      where: { id },
+    });
 
     if (!note) {
       throw new NotFoundException('Note not found');
     }
 
-    return { ...note };
+    return note;
   }
 
   async update(id: string, payload: UpdateNoteDto): Promise<Note> {
     const note = await this.findOne(id);
-
-    const updated: Note = {
-      ...note,
-      ...payload,
-      updatedAt: new Date(),
-    };
-
-    this.notes.set(id, updated);
-    return { ...updated };
+    const merged = this.notesRepository.merge(note, payload);
+    return this.notesRepository.save(merged);
   }
 
   async remove(id: string): Promise<void> {
-    if (!this.notes.delete(id)) {
+    const result = await this.notesRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException('Note not found');
     }
   }
