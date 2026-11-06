@@ -3,16 +3,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
-import { JWT_SECRET } from './constants';
+import { jwtAsyncConfig } from './jwt.config';
 
 @Module({
-  imports: [
-    UsersModule,
-    JwtModule.register({
-      global: false,
-      secret: JWT_SECRET,
-    }),
-  ],
+  imports: [UsersModule, JwtModule.registerAsync(jwtAsyncConfig)],
   providers: [AuthService],
   controllers: [AuthController],
   exports: [AuthService],

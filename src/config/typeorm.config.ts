@@ -1,5 +1,8 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import {
+  TypeOrmModuleAsyncOptions,
+  TypeOrmModuleOptions,
+} from '@nestjs/typeorm';
 import { Note } from '../notes/note.entity';
 import { User } from '../users/user.entity';
 
@@ -7,10 +10,11 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
     const isTestEnv = configService.get<string>('NODE_ENV') === 'test';
-    const baseOptions: Pick<TypeOrmModuleOptions, 'entities' | 'synchronize'> = {
-      entities: [User, Note],
-      synchronize: true,
-    };
+    const baseOptions: Pick<TypeOrmModuleOptions, 'entities' | 'synchronize'> =
+      {
+        entities: [User, Note],
+        synchronize: true,
+      };
 
     if (isTestEnv) {
       return {
@@ -22,10 +26,13 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
     }
 
     const defaultSsl =
-      configService.get<string>('DB_SSL', process.env.NODE_ENV === 'production' ? 'true' : 'false') ===
-      'true';
+      configService.get<string>(
+        'DB_SSL',
+        process.env.NODE_ENV === 'production' ? 'true' : 'false',
+      ) === 'true';
     const rejectUnauthorized =
-      configService.get<string>('DB_SSL_REJECT_UNAUTHORIZED', 'false') === 'true';
+      configService.get<string>('DB_SSL_REJECT_UNAUTHORIZED', 'false') ===
+      'true';
 
     const databaseUrl = configService.get<string>('DATABASE_URL');
     if (databaseUrl) {
@@ -35,8 +42,8 @@ export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
       const ssl = isRailwayInternal
         ? false
         : defaultSsl
-        ? { rejectUnauthorized }
-        : false;
+          ? { rejectUnauthorized }
+          : false;
 
       return {
         type: 'postgres',
