@@ -64,6 +64,10 @@ The application uses PostgreSQL via TypeORM in development/production. Set one o
 
 When `NODE_ENV=test`, the app automatically falls back to an in-memory SQLite database so the Jest test suites can run without a Postgres instance.
 
+## Authentication configuration
+
+Set `JWT_SECRET` to a private random value before starting the server. The app signs and verifies access and refresh tokens with it and refuses to start when it is not set. Change the value to rotate the signing key; tokens signed with the previous value are then rejected.
+
 ## Run tests
 
 ```bash

@@ -3,9 +3,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
-import { JWT_SECRET } from './constants';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
+
+const TEST_JWT_SECRET = 'test-jwt-secret';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -24,7 +25,7 @@ describe('AuthService', () => {
         }),
         TypeOrmModule.forFeature([User]),
         JwtModule.register({
-          secret: JWT_SECRET,
+          secret: TEST_JWT_SECRET,
         }),
       ],
       providers: [AuthService, UsersService],
@@ -51,7 +52,9 @@ describe('AuthService', () => {
   it('prevents duplicate usernames', async () => {
     await service.register('bob', 'password123');
 
-    await expect(service.register('bob', 'password123')).rejects.toBeInstanceOf(ConflictException);
+    await expect(service.register('bob', 'password123')).rejects.toBeInstanceOf(
+      ConflictException,
+    );
   });
 
   it('logs in existing users with correct credentials', async () => {
@@ -65,8 +68,8 @@ describe('AuthService', () => {
   it('rejects invalid credentials', async () => {
     await service.register('dana', 'password123');
 
-    await expect(service.login('dana', 'wrong-password')).rejects.toBeInstanceOf(
-      UnauthorizedException,
-    );
+    await expect(
+      service.login('dana', 'wrong-password'),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 });

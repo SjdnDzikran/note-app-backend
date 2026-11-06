@@ -34,7 +34,10 @@ describe('NotesController', () => {
   });
 
   it('creates and returns a note', async () => {
-    const payload: CreateNoteDto = { title: 'Controller note', content: 'Content' };
+    const payload: CreateNoteDto = {
+      title: 'Controller note',
+      content: 'Content',
+    };
     const note = await controller.create(payload);
 
     expect(note.id).toEqual(expect.any(String));
@@ -42,7 +45,10 @@ describe('NotesController', () => {
   });
 
   it('lists and updates notes', async () => {
-    const created = await controller.create({ title: 'Original', content: 'Body' });
+    const created = await controller.create({
+      title: 'Original',
+      content: 'Body',
+    });
 
     const list = await controller.findAll();
     expect(list).toHaveLength(1);
@@ -52,6 +58,8 @@ describe('NotesController', () => {
     expect(updated.content).toBe('Updated body');
 
     await controller.remove(created.id);
-    await expect(controller.findOne(created.id)).rejects.toThrow('Note not found');
+    await expect(controller.findOne(created.id)).rejects.toThrow(
+      'Note not found',
+    );
   });
 });

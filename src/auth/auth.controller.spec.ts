@@ -3,9 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JWT_SECRET } from './constants';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
+
+const TEST_JWT_SECRET = 'test-jwt-secret';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -23,7 +24,7 @@ describe('AuthController', () => {
         }),
         TypeOrmModule.forFeature([User]),
         JwtModule.register({
-          secret: JWT_SECRET,
+          secret: TEST_JWT_SECRET,
         }),
       ],
       controllers: [AuthController],
@@ -38,7 +39,10 @@ describe('AuthController', () => {
   });
 
   it('registers users and returns token pairs', async () => {
-    const tokens = await controller.register({ username: 'user1', password: 'password123' });
+    const tokens = await controller.register({
+      username: 'user1',
+      password: 'password123',
+    });
 
     expect(tokens.accessToken).toEqual(expect.any(String));
     expect(tokens.refreshToken).toEqual(expect.any(String));
@@ -46,7 +50,10 @@ describe('AuthController', () => {
 
   it('logs in users and returns token pairs', async () => {
     await controller.register({ username: 'user2', password: 'password123' });
-    const tokens = await controller.login({ username: 'user2', password: 'password123' });
+    const tokens = await controller.login({
+      username: 'user2',
+      password: 'password123',
+    });
 
     expect(tokens.accessToken).toEqual(expect.any(String));
     expect(tokens.refreshToken).toEqual(expect.any(String));

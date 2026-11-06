@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 
 process.env.NODE_ENV = process.env.NODE_ENV ?? 'test';
+process.env.JWT_SECRET = process.env.JWT_SECRET ?? 'test-jwt-secret';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -30,7 +31,10 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET)', async () => {
-    await request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
+    await request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Hello World!');
   });
 
   it('/auth/register (POST)', async () => {
@@ -72,7 +76,9 @@ describe('AppController (e2e)', () => {
   });
 
   it('/notes (GET)', async () => {
-    const response = await request(app.getHttpServer()).get('/notes').expect(200);
+    const response = await request(app.getHttpServer())
+      .get('/notes')
+      .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThanOrEqual(1);
@@ -83,7 +89,9 @@ describe('AppController (e2e)', () => {
       throw new Error('Expected note to be created in previous test');
     }
 
-    const response = await request(app.getHttpServer()).get(`/notes/${createdNoteId}`).expect(200);
+    const response = await request(app.getHttpServer())
+      .get(`/notes/${createdNoteId}`)
+      .expect(200);
 
     expect(response.body.id).toBe(createdNoteId);
   });
@@ -106,8 +114,12 @@ describe('AppController (e2e)', () => {
       throw new Error('Expected note to be created in previous test');
     }
 
-    await request(app.getHttpServer()).delete(`/notes/${createdNoteId}`).expect(204);
+    await request(app.getHttpServer())
+      .delete(`/notes/${createdNoteId}`)
+      .expect(204);
 
-    await request(app.getHttpServer()).get(`/notes/${createdNoteId}`).expect(404);
+    await request(app.getHttpServer())
+      .get(`/notes/${createdNoteId}`)
+      .expect(404);
   });
 });
