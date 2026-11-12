@@ -15,6 +15,6 @@ import { JWT_SECRET } from './constants';
   ],
   providers: [AuthService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

@@ -38,7 +38,10 @@ describe('AuthController', () => {
   });
 
   it('registers users and returns token pairs', async () => {
-    const tokens = await controller.register({ username: 'user1', password: 'password123' });
+    const tokens = await controller.register({
+      username: 'user1',
+      password: 'password123',
+    });
 
     expect(tokens.accessToken).toEqual(expect.any(String));
     expect(tokens.refreshToken).toEqual(expect.any(String));
@@ -46,7 +49,10 @@ describe('AuthController', () => {
 
   it('logs in users and returns token pairs', async () => {
     await controller.register({ username: 'user2', password: 'password123' });
-    const tokens = await controller.login({ username: 'user2', password: 'password123' });
+    const tokens = await controller.login({
+      username: 'user2',
+      password: 'password123',
+    });
 
     expect(tokens.accessToken).toEqual(expect.any(String));
     expect(tokens.refreshToken).toEqual(expect.any(String));

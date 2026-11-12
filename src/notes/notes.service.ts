@@ -12,20 +12,21 @@ export class NotesService {
     private readonly notesRepository: Repository<Note>,
   ) {}
 
-  create(payload: CreateNoteDto): Promise<Note> {
-    const note = this.notesRepository.create(payload);
+  create(payload: CreateNoteDto, ownerId: string): Promise<Note> {
+    const note = this.notesRepository.create({ ...payload, ownerId });
     return this.notesRepository.save(note);
   }
 
-  async findAll(): Promise<Note[]> {
+  async findAll(ownerId: string): Promise<Note[]> {
     return this.notesRepository.find({
+      where: { ownerId },
       order: { createdAt: 'DESC' },
     });
   }
 
-  async findOne(id: string): Promise<Note> {
+  async findOne(id: string, ownerId: string): Promise<Note> {
     const note = await this.notesRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
     });
 
     if (!note) {
@@ -35,14 +36,18 @@ export class NotesService {
     return note;
   }
 
-  async update(id: string, payload: UpdateNoteDto): Promise<Note> {
-    const note = await this.findOne(id);
+  async update(
+    id: string,
+    ownerId: string,
+    payload: UpdateNoteDto,
+  ): Promise<Note> {
+    const note = await this.findOne(id, ownerId);
     const merged = this.notesRepository.merge(note, payload);
     return this.notesRepository.save(merged);
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.notesRepository.delete(id);
+  async remove(id: string, ownerId: string): Promise<void> {
+    const result = await this.notesRepository.delete({ id, ownerId });
     if (result.affected === 0) {
       throw new NotFoundException('Note not found');
     }

@@ -1,4 +1,10 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'notes' })
 export class Note {
@@ -10,6 +16,9 @@ export class Note {
 
   @Column('text')
   content!: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  ownerId!: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
